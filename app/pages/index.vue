@@ -11,7 +11,7 @@ import {
     UserPlus,
     Zap,
 } from "lucide-vue-next";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -50,80 +50,173 @@ const pillars = [
     },
 ] as const;
 
-const members = [
-    {
-        name: "XMDS",
-        role: "组织发起 / 生态推进",
-        summary: "围绕 Gloss Mod 组织、社区运营与项目生态持续推进。",
-        initials: "XM",
-        href: "https://github.com/XMDS",
-    },
-    {
-        name: "3DMXM",
-        role: "核心维护 / 项目协作",
-        summary: "参与组织管理与项目落地，持续维护公开仓库和讨论渠道。",
-        initials: "3D",
-        href: "https://github.com/3DMXM",
-    },
-    {
-        name: "Open Contributors",
-        role: "原创 / 汉化 / 工具开发",
-        summary:
-            "面向有作品与执行力的创作者开放，欢迎持续贡献 Mod、脚本与工具。",
-        initials: "OC",
-        href: "https://github.com/orgs/GlossMod/people",
-    },
-] as const;
+const membersPage = ref(1);
+const membersPageSize = 12;
+const membersTotal = ref(0);
+const membersTotalPages = computed(() =>
+    Math.max(1, Math.ceil(membersTotal.value / membersPageSize)),
+);
 
-const projects = [
-    {
-        name: "Gloss-Mod-Manager",
-        description:
-            "现代化游戏模组管理器，为玩家提供更清晰、更可靠的 Mod 管理体验。",
-        language: "TypeScript",
-        stars: "391",
-        href: "https://github.com/GlossMod/Gloss-Mod-Manager",
+const { data: orgMembers, pending: membersPending } = await useAsyncData(
+    "orgMembers",
+    async () => {
+        try {
+            const membersRes = await $fetch<{
+                success: boolean;
+                data?: {
+                    data: Array<{
+                        id: number;
+                        user_nickName: string;
+                        user_Intr: string;
+                        user_avatar: string;
+                        user_tag: string;
+                        mod_count: number;
+                        mod_original_count: number;
+                        mod_translate_count: number;
+                    }>;
+                    count: number;
+                };
+            }>("/api/team/userList", {
+                method: "POST",
+                body: {
+                    page: membersPage.value,
+                    pageSize: membersPageSize,
+                    search: "",
+                },
+            });
+
+            const membersRows = membersRes.data?.data || [];
+            membersTotal.value = membersRes.data?.count || 0;
+
+            return membersRows.map((m) => ({
+                name: m.user_nickName,
+                role: `${m.user_tag || "团队成员"} · 作品 ${m.mod_count}`,
+                summary:
+                    m.user_Intr ||
+                    `原创 ${m.mod_original_count} / 汉化 ${m.mod_translate_count}`,
+                initials: m.user_nickName.substring(0, 2).toUpperCase(),
+                href: `https://mod.3dmgame.com/u/${m.id}`,
+                avatar: m.user_avatar
+                    ? `https://mod.3dmgame.com${m.user_avatar}`
+                    : "",
+            }));
+        } catch (error) {
+            // Fallback in case of rate limiting
+            return [
+                {
+                    name: "XMDS",
+                    role: "组织发起 / 生态推进",
+                    summary:
+                        "围绕 Gloss Mod 组织、社区运营与项目生态持续推进。",
+                    initials: "XM",
+                    href: "https://github.com/XMDS",
+                    avatar: "https://avatars.githubusercontent.com/u/20371019?v=4",
+                },
+                {
+                    name: "3DMXM",
+                    role: "核心维护 / 项目协作",
+                    summary:
+                        "参与组织管理与项目落地，持续维护公开仓库和讨论渠道。",
+                    initials: "3D",
+                    href: "https://github.com/3DMXM",
+                    avatar: "https://avatars.githubusercontent.com/u/28587093?v=4",
+                },
+                {
+                    name: "Open Contributors",
+                    role: "原创 / 汉化 / 工具开发",
+                    summary:
+                        "面向有作品与执行力的创作者开放，欢迎持续贡献 Mod、脚本与工具。",
+                    initials: "OC",
+                    href: "https://github.com/orgs/GlossMod/people",
+                    avatar: "",
+                },
+            ];
+        }
     },
     {
-        name: "UnityScriptTrainer",
-        description:
-            "面向 Unity 游戏的内置修改器能力集合，兼顾实用性与扩展性。",
-        language: "C#",
-        stars: "172",
-        href: "https://github.com/GlossMod/UnityScriptTrainer",
+        watch: [membersPage],
+    },
+);
+
+const { data: orgInfo } = await useAsyncData("orgInfo", () =>
+    $fetch("https://api.github.com/users/GlossMod"),
+);
+
+const projectsPage = ref(1);
+const projectsPageSize = 24;
+const projectsTotal = ref(0);
+const projectsTotalPages = computed(() =>
+    Math.max(1, Math.ceil(projectsTotal.value / projectsPageSize)),
+);
+
+const { data: repositories, pending: projectsPending } = await useAsyncData(
+    "repos",
+    async () => {
+        const modRes = await $fetch<{
+            success: boolean;
+            data?: {
+                data: Array<{
+                    id: number;
+                    mods_title: string;
+                    mods_desc: string;
+                    mods_download_cnt: number;
+                    mods_click_cnt: number;
+                    mods_type_name: string;
+                    game_name: string;
+                }>;
+                count: number;
+            };
+        }>("/api/team/modList", {
+            method: "POST",
+            body: {
+                page: projectsPage.value,
+                pageSize: projectsPageSize,
+                original: 1,
+                order: 1,
+                search: "",
+            },
+        });
+
+        const rows = modRes.data?.data || [];
+        projectsTotal.value = modRes.data?.count || 0;
+        return rows.map((item) => ({
+            id: item.id,
+            html_url: `https://mod.3dmgame.com/mod/${item.id}`,
+            language: item.mods_type_name || item.game_name || "作品",
+            stargazers_count:
+                item.mods_download_cnt || item.mods_click_cnt || 0,
+            name: item.mods_title,
+            description: item.mods_desc,
+        }));
     },
     {
-        name: "RDR2NativeTrainer",
-        description: "围绕荒野大镖客 2 的线下训练器与原生能力封装。",
-        language: "C++",
-        stars: "30",
-        href: "https://github.com/GlossMod/RDR2NativeTrainer",
+        watch: [projectsPage],
     },
-    {
-        name: "EU5-Modding-Mcp",
-        description:
-            "为 Europa Universalis V 提供文档、效果参考与指令能力的 MCP 服务器。",
-        language: "Python",
-        stars: "3",
-        href: "https://github.com/GlossMod/EU5-Modding-Mcp",
-    },
-    {
-        name: "gloss-mod-mcp",
-        description:
-            "面向 3DM Mod API 的 MCP 服务，帮助工具和模型更高效地接入数据与流程。",
-        language: "Python",
-        stars: "0",
-        href: "https://github.com/GlossMod/gloss-mod-mcp",
-    },
-    {
-        name: "gmm-plug-in",
-        description:
-            "围绕 GMM 的插件与扩展能力，为模组管理生态补充更多场景支持。",
-        language: "C++",
-        stars: "2",
-        href: "https://github.com/GlossMod/gmm-plug-in",
-    },
-] as const;
+);
+
+const prevMembersPage = () => {
+    if (membersPage.value > 1) {
+        membersPage.value -= 1;
+    }
+};
+
+const nextMembersPage = () => {
+    if (membersPage.value < membersTotalPages.value) {
+        membersPage.value += 1;
+    }
+};
+
+const prevProjectsPage = () => {
+    if (projectsPage.value > 1) {
+        projectsPage.value -= 1;
+    }
+};
+
+const nextProjectsPage = () => {
+    if (projectsPage.value < projectsTotalPages.value) {
+        projectsPage.value += 1;
+    }
+};
 
 const requirements = [
     "具备独立原创或汉化 Mod 的能力",
@@ -168,13 +261,20 @@ const channels = [
                     href="#top"
                     class="flex items-center gap-3 transition-opacity hover:opacity-80"
                 >
-                    <span
-                        class="flex size-8 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground shadow-sm"
-                        >GM</span
-                    >
+                    <Avatar class="size-8 rounded-lg">
+                        <AvatarImage
+                            v-if="orgInfo?.avatar_url"
+                            :src="orgInfo.avatar_url"
+                            alt="Gloss Mod"
+                        />
+                        <AvatarFallback
+                            class="rounded-lg bg-primary text-xs font-bold text-primary-foreground shadow-sm"
+                            >GM</AvatarFallback
+                        >
+                    </Avatar>
                     <span
                         class="text-sm font-semibold tracking-widest text-foreground"
-                        >GLOSS MOD</span
+                        >{{ orgInfo?.name || "GLOSS MOD" }}</span
                     >
                 </a>
                 <nav
@@ -332,44 +432,101 @@ const channels = [
                 </div>
 
                 <div class="grid w-full gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    <div
-                        v-for="member in members"
-                        :key="member.name"
-                        class="flex gap-5 rounded-3xl border border-border/50 bg-card/30 p-6 shadow-sm transition-all hover:bg-card/50"
-                    >
-                        <Avatar
-                            class="size-14 rounded-2xl border border-border/60 bg-muted/50"
+                    <template v-if="membersPending">
+                        <div
+                            v-for="i in 3"
+                            :key="i"
+                            class="flex gap-5 rounded-3xl border border-border/50 bg-card/30 p-6 shadow-sm animate-pulse"
                         >
-                            <AvatarFallback
-                                class="font-display font-medium text-foreground"
-                                >{{ member.initials }}</AvatarFallback
-                            >
-                        </Avatar>
-                        <div class="flex flex-1 flex-col">
-                            <div class="flex items-center justify-between">
-                                <h3
-                                    class="text-lg font-semibold text-foreground"
-                                >
-                                    {{ member.name }}
-                                </h3>
-                                <a
-                                    :href="member.href"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    class="text-muted-foreground hover:text-primary transition-colors"
-                                >
-                                    <ExternalLink class="size-4" />
-                                </a>
+                            <div class="size-14 rounded-2xl bg-muted"></div>
+                            <div class="flex flex-1 flex-col space-y-2">
+                                <div class="h-5 w-1/2 bg-muted rounded"></div>
+                                <div class="h-3 w-1/3 bg-muted rounded"></div>
+                                <div
+                                    class="h-4 w-full bg-muted rounded mt-2"
+                                ></div>
                             </div>
-                            <p class="mt-1 text-xs font-medium text-primary/80">
-                                {{ member.role }}
-                            </p>
-                            <p
-                                class="mt-3 text-sm leading-relaxed text-muted-foreground line-clamp-2"
-                            >
-                                {{ member.summary }}
-                            </p>
                         </div>
+                    </template>
+                    <template v-else-if="orgMembers">
+                        <div
+                            v-for="member in orgMembers"
+                            :key="member.name"
+                            class="flex gap-5 rounded-3xl border border-border/50 bg-card/30 p-6 shadow-sm transition-all hover:bg-card/50"
+                        >
+                            <Avatar
+                                class="size-14 rounded-2xl border border-border/60 bg-muted/50"
+                            >
+                                <AvatarImage
+                                    v-if="member.avatar"
+                                    :src="member.avatar"
+                                    :alt="member.name"
+                                />
+                                <AvatarFallback
+                                    class="font-display font-medium text-foreground"
+                                    >{{ member.initials }}</AvatarFallback
+                                >
+                            </Avatar>
+                            <div class="flex flex-1 flex-col">
+                                <div class="flex items-center justify-between">
+                                    <h3
+                                        class="text-lg font-semibold text-foreground"
+                                    >
+                                        {{ member.name }}
+                                    </h3>
+                                    <a
+                                        :href="member.href"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        class="text-muted-foreground hover:text-primary transition-colors"
+                                    >
+                                        <ExternalLink class="size-4" />
+                                    </a>
+                                </div>
+                                <p
+                                    class="mt-1 text-xs font-medium text-primary/80"
+                                >
+                                    {{ member.role }}
+                                </p>
+                                <p
+                                    class="mt-3 text-sm leading-relaxed text-muted-foreground line-clamp-2"
+                                >
+                                    {{ member.summary }}
+                                </p>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <div
+                    class="mt-10 flex w-full items-center justify-between gap-4 rounded-2xl border border-border/40 bg-card/20 px-4 py-3"
+                >
+                    <p class="text-sm text-muted-foreground">
+                        团队成员 第 {{ membersPage }} /
+                        {{ membersTotalPages }} 页 · 共 {{ membersTotal }} 人
+                    </p>
+                    <div class="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            class="rounded-full"
+                            :disabled="membersPending || membersPage <= 1"
+                            @click="prevMembersPage"
+                        >
+                            上一页
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            class="rounded-full"
+                            :disabled="
+                                membersPending ||
+                                membersPage >= membersTotalPages
+                            "
+                            @click="nextMembersPage"
+                        >
+                            下一页
+                        </Button>
                     </div>
                 </div>
             </section>
@@ -393,65 +550,142 @@ const channels = [
                     </div>
                     <Button variant="ghost" class="w-fit rounded-full" as-child>
                         <a
-                            href="https://github.com/orgs/GlossMod/repositories"
+                            href="https://mod.3dmgame.com"
                             target="_blank"
                             rel="noreferrer"
                         >
-                            探索全部仓库
+                            探索全部
+                            {{ projectsTotal || "" }} 个作品
                             <ArrowRight class="ml-2 size-4" />
                         </a>
                     </Button>
                 </div>
 
                 <div class="grid w-full gap-6 md:grid-cols-2 xl:grid-cols-3">
-                    <a
-                        v-for="project in projects"
-                        :key="project.name"
-                        :href="project.href"
-                        target="_blank"
-                        rel="noreferrer"
-                        class="group flex h-full flex-col justify-between rounded-3xl border border-border/50 bg-card/30 p-8 shadow-sm transition-all hover:border-primary/30 hover:bg-card/60"
-                    >
-                        <div>
-                            <div class="mb-6 flex items-center justify-between">
-                                <Badge
-                                    variant="secondary"
-                                    class="rounded-full bg-secondary/60 text-xs text-secondary-foreground font-mono"
-                                >
-                                    {{ project.language }}
-                                </Badge>
-                                <span
-                                    class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
-                                >
-                                    <svg
-                                        viewBox="0 0 16 16"
-                                        fill="currentColor"
-                                        class="size-3.5 text-yellow-500"
-                                    >
-                                        <path
-                                            d="M8 1.5l2.4 5.3 5.6.5-4.2 3.8 1.2 5.4L8 13.6l-5 2.9 1.2-5.4L0 7.3l5.6-.5z"
-                                        />
-                                    </svg>
-                                    {{ project.stars }}
-                                </span>
-                            </div>
-                            <h3
-                                class="mb-3 text-xl font-semibold tracking-tight text-foreground group-hover:text-primary transition-colors"
-                            >
-                                {{ project.name }}
-                            </h3>
-                            <p
-                                class="text-sm leading-relaxed text-muted-foreground"
-                            >
-                                {{ project.description }}
-                            </p>
-                        </div>
+                    <template v-if="projectsPending">
+                        <!-- Loading Skeletons -->
                         <div
-                            class="mt-8 flex items-center text-sm font-medium text-primary opacity-0 -translate-x-2 transition-all group-hover:opacity-100 group-hover:translate-x-0"
+                            v-for="i in 6"
+                            :key="i"
+                            class="group flex h-[280px] flex-col justify-between rounded-3xl border border-border/50 bg-card/30 p-8 shadow-sm animate-pulse"
                         >
-                            查看源码 <ArrowRight class="ml-1.5 size-4" />
+                            <div>
+                                <div
+                                    class="mb-6 flex items-center justify-between"
+                                >
+                                    <div
+                                        class="h-6 w-16 rounded-full bg-muted"
+                                    ></div>
+                                    <div
+                                        class="h-4 w-8 rounded-full bg-muted"
+                                    ></div>
+                                </div>
+                                <div
+                                    class="h-6 w-3/4 rounded-md bg-muted mb-3"
+                                ></div>
+                                <div
+                                    class="h-4 w-full rounded-md bg-muted mt-2"
+                                ></div>
+                                <div
+                                    class="h-4 w-5/6 rounded-md bg-muted mt-2"
+                                ></div>
+                            </div>
                         </div>
-                    </a>
+                    </template>
+                    <template v-else-if="repositories?.length">
+                        <a
+                            v-for="project in repositories"
+                            :key="project.id"
+                            :href="project.html_url"
+                            target="_blank"
+                            rel="noreferrer"
+                            class="group flex h-full min-h-[280px] flex-col justify-between rounded-3xl border border-border/50 bg-card/30 p-8 shadow-sm transition-all hover:border-primary/30 hover:bg-card/60"
+                        >
+                            <div>
+                                <div
+                                    class="mb-6 flex items-center justify-between"
+                                >
+                                    <Badge
+                                        v-if="project.language"
+                                        variant="secondary"
+                                        class="rounded-full bg-secondary/60 text-xs text-secondary-foreground font-mono"
+                                    >
+                                        {{ project.language }}
+                                    </Badge>
+                                    <Badge
+                                        v-else
+                                        variant="outline"
+                                        class="rounded-full text-xs text-muted-foreground font-mono"
+                                    >
+                                        Unknown
+                                    </Badge>
+                                    <span
+                                        class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
+                                    >
+                                        <svg
+                                            viewBox="0 0 16 16"
+                                            fill="currentColor"
+                                            class="size-3.5 text-yellow-500"
+                                        >
+                                            <path
+                                                d="M8 1.5l2.4 5.3 5.6.5-4.2 3.8 1.2 5.4L8 13.6l-5 2.9 1.2-5.4L0 7.3l5.6-.5z"
+                                            />
+                                        </svg>
+                                        {{ project.stargazers_count }}
+                                    </span>
+                                </div>
+                                <h3
+                                    class="mb-3 text-xl font-semibold tracking-tight text-foreground group-hover:text-primary transition-colors line-clamp-1"
+                                    :title="project.name"
+                                >
+                                    {{ project.name }}
+                                </h3>
+                                <p
+                                    class="text-sm leading-relaxed text-muted-foreground line-clamp-3"
+                                >
+                                    {{ project.description || "暂无描述。" }}
+                                </p>
+                            </div>
+                            <div
+                                class="mt-8 flex items-center text-sm font-medium text-primary opacity-0 -translate-x-2 transition-all group-hover:opacity-100 group-hover:translate-x-0"
+                            >
+                                查看作品 <ArrowRight class="ml-1.5 size-4" />
+                            </div>
+                        </a>
+                    </template>
+                </div>
+
+                <div
+                    class="mt-10 flex w-full items-center justify-between gap-4 rounded-2xl border border-border/40 bg-card/20 px-4 py-3"
+                >
+                    <p class="text-sm text-muted-foreground">
+                        作品列表 第 {{ projectsPage }} /
+                        {{ projectsTotalPages }} 页 · 共
+                        {{ projectsTotal }} 个作品
+                    </p>
+                    <div class="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            class="rounded-full"
+                            :disabled="projectsPending || projectsPage <= 1"
+                            @click="prevProjectsPage"
+                        >
+                            上一页
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            class="rounded-full"
+                            :disabled="
+                                projectsPending ||
+                                projectsPage >= projectsTotalPages
+                            "
+                            @click="nextProjectsPage"
+                        >
+                            下一页
+                        </Button>
+                    </div>
                 </div>
             </section>
 

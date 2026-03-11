@@ -1,0 +1,71 @@
+name: Deploy Nuxt
+
+on:
+    push:
+        branches:
+            - main
+    workflow_dispatch:
+
+env:
+    NODE_VERSION: "20"
+    APP_NAME: glossmod-web
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Build Nuxt app
+              run: npm run build
+
+            - name: Pack deployment artifact
+              run: tar -czf release.tgz .output public package.json
+
+            - name: Upload artifact to server
+              uses: appleboy/scp-action@v0.1.7
+              with:
+                  host: ${{ secrets.DEPLOY_HOST }}
+                  username: ${{ secrets.DEPLOY_USER }}
+                  key: ${{ secrets.DEPLOY_SSH_KEY }}
+                  port: ${{ secrets.DEPLOY_PORT }}
+                  source: release.tgz
+                  target: ${{ secrets.DEPLOY_PATH }}
+
+            - name: Restart app on server
+              uses: appleboy/ssh-action@v1.2.0
+              with:
+                  host: ${{ secrets.DEPLOY_HOST }}
+                  username: ${{ secrets.DEPLOY_USER }}
+                  key: ${{ secrets.DEPLOY_SSH_KEY }}
+                  port: ${{ secrets.DEPLOY_PORT }}
+                  script: |
+                      set -e
+                      cd "${{ secrets.DEPLOY_PATH }}"
+                      tar -xzf release.tgz
+                      rm -f release.tgz
+
+                      if ! command -v pm2 >/dev/null 2>&1; then
+                        npm install -g pm2
+                      fi
+
+                      if pm2 describe "${{ env.APP_NAME }}" >/dev/null 2>&1; then
+                        pm2 restart "${{ env.APP_NAME }}" --update-env
+                      else
+                        NODE_ENV=production PORT=3000 pm2 start .output/server/index.mjs --name "${{ env.APP_NAME }}"
+                      fi
+
+                      pm2 save
