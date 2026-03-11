@@ -1,0 +1,159 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap");
+
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --font-sans: "Manrope", "Segoe UI", sans-serif;
+    --font-display: "Space Grotesk", "Manrope", sans-serif;
+
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
+    --color-background: oklch(var(--background));
+    --color-foreground: oklch(var(--foreground));
+    --color-card: oklch(var(--card));
+    --color-card-foreground: oklch(var(--card-foreground));
+    --color-popover: oklch(var(--popover));
+    --color-popover-foreground: oklch(var(--popover-foreground));
+    --color-primary: oklch(var(--primary));
+    --color-primary-foreground: oklch(var(--primary-foreground));
+    --color-secondary: oklch(var(--secondary));
+    --color-secondary-foreground: oklch(var(--secondary-foreground));
+    --color-muted: oklch(var(--muted));
+    --color-muted-foreground: oklch(var(--muted-foreground));
+    --color-accent: oklch(var(--accent));
+    --color-accent-foreground: oklch(var(--accent-foreground));
+    --color-destructive: oklch(var(--destructive));
+    --color-border: oklch(var(--border));
+    --color-input: oklch(var(--input));
+    --color-ring: oklch(var(--ring));
+    --color-chart-1: oklch(var(--chart-1));
+    --color-chart-2: oklch(var(--chart-2));
+    --color-chart-3: oklch(var(--chart-3));
+    --color-chart-4: oklch(var(--chart-4));
+    --color-chart-5: oklch(var(--chart-5));
+    --color-sidebar: oklch(var(--sidebar));
+    --color-sidebar-foreground: oklch(var(--sidebar-foreground));
+    --color-sidebar-primary: oklch(var(--sidebar-primary));
+    --color-sidebar-primary-foreground: oklch(var(--sidebar-primary-foreground));
+    --color-sidebar-accent: oklch(var(--sidebar-accent));
+    --color-sidebar-accent-foreground: oklch(var(--sidebar-accent-foreground));
+    --color-sidebar-border: oklch(var(--sidebar-border));
+    --color-sidebar-ring: oklch(var(--sidebar-ring));
+}
+
+:root {
+    --radius: 0.625rem;
+    --background: 0.985 0.008 95;
+    --foreground: 0.23 0.02 258;
+    --card: 0.995 0.004 95;
+    --card-foreground: 0.23 0.02 258;
+    --popover: 0.995 0.004 95;
+    --popover-foreground: 0.23 0.02 258;
+    --primary: 0.31 0.03 252;
+    --primary-foreground: 0.985 0.008 95;
+    --secondary: 0.95 0.015 92;
+    --secondary-foreground: 0.28 0.02 252;
+    --muted: 0.95 0.012 92;
+    --muted-foreground: 0.52 0.018 258;
+    --accent: 0.91 0.028 75;
+    --accent-foreground: 0.25 0.02 252;
+    --destructive: 0.577 0.245 27.325;
+    --border: 0.89 0.012 88;
+    --input: 0.89 0.012 88;
+    --ring: 0.62 0.022 80;
+    --chart-1: 0.62 0.16 45;
+    --chart-2: 0.58 0.08 190;
+    --chart-3: 0.42 0.06 250;
+    --chart-4: 0.72 0.13 80;
+    --chart-5: 0.67 0.15 30;
+    --sidebar: 0.985 0.008 95;
+    --sidebar-foreground: 0.23 0.02 258;
+    --sidebar-primary: 0.31 0.03 252;
+    --sidebar-primary-foreground: 0.985 0.008 95;
+    --sidebar-accent: 0.95 0.012 92;
+    --sidebar-accent-foreground: 0.25 0.02 252;
+    --sidebar-border: 0.89 0.012 88;
+    --sidebar-ring: 0.62 0.022 80;
+}
+
+.dark {
+    --background: 0.17 0.018 255;
+    --foreground: 0.94 0.01 92;
+    --card: 0.21 0.018 255;
+    --card-foreground: 0.94 0.01 92;
+    --popover: 0.21 0.018 255;
+    --popover-foreground: 0.94 0.01 92;
+    --primary: 0.92 0.02 82;
+    --primary-foreground: 0.2 0.018 255;
+    --secondary: 0.27 0.018 255;
+    --secondary-foreground: 0.94 0.01 92;
+    --muted: 0.25 0.018 255;
+    --muted-foreground: 0.72 0.014 92;
+    --accent: 0.32 0.024 75;
+    --accent-foreground: 0.94 0.01 92;
+    --destructive: 0.704 0.191 22.216;
+    --border: 1 0 0;
+    --input: 1 0 0;
+    --ring: 0.74 0.014 82;
+    --chart-1: 0.72 0.14 55;
+    --chart-2: 0.62 0.09 190;
+    --chart-3: 0.7 0.09 82;
+    --chart-4: 0.58 0.16 320;
+    --chart-5: 0.64 0.18 22;
+    --sidebar: 0.21 0.018 255;
+    --sidebar-foreground: 0.94 0.01 92;
+    --sidebar-primary: 0.92 0.02 82;
+    --sidebar-primary-foreground: 0.2 0.018 255;
+    --sidebar-accent: 0.27 0.018 255;
+    --sidebar-accent-foreground: 0.94 0.01 92;
+    --sidebar-border: 1 0 0;
+    --sidebar-ring: 0.74 0.014 82;
+}
+
+@layer base {
+    * {
+        @apply border-border outline-ring/50;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: "Manrope", "Segoe UI", sans-serif;
+        background-image:
+            radial-gradient(circle at top left, color-mix(in oklch, oklch(var(--accent)) 22%, transparent) 0, transparent 28%),
+            linear-gradient(180deg, color-mix(in oklch, oklch(var(--background)) 85%, white 15%) 0%, oklch(var(--background)) 100%);
+        @apply bg-background text-foreground;
+    }
+
+    ::selection {
+        background: color-mix(in oklch, oklch(var(--accent)) 45%, transparent);
+    }
+}
+
+@layer utilities {
+    .font-display {
+        font-family: "Space Grotesk", "Manrope", sans-serif;
+    }
+
+    .geo-grid {
+        background-image:
+            linear-gradient(to right, color-mix(in oklch, var(--border) 70%, transparent) 1px, transparent 1px),
+            linear-gradient(to bottom, color-mix(in oklch, var(--border) 70%, transparent) 1px, transparent 1px);
+        background-size: 32px 32px;
+    }
+
+    .geo-panel {
+        backdrop-filter: blur(20px);
+        background: color-mix(in oklch, oklch(var(--card)) 86%, transparent);
+    }
+
+    .section-shell {
+        @apply relative overflow-hidden rounded-[2rem] border border-border/80 bg-card/80;
+    }
+}
