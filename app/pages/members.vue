@@ -48,6 +48,10 @@ function submitSearch() {
 }
 
 getMembers();
+
+useSeoMeta({
+    title: "成员",
+});
 </script>
 
 <template>

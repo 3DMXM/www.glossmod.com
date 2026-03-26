@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Button } from "#components";
 import { Badge } from "#components";
+import { Info, ArrowRight } from "lucide-vue-next";
 </script>
 <template>
     <div
@@ -28,14 +29,29 @@ import { Badge } from "#components";
         <div
             class="flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
             <Button size="lg" class="px-8 text-md font-medium h-12" as-child>
-                <NuxtLink to="/join">加入我们</NuxtLink>
+                <NuxtLink to="/join">加入我们 <ArrowRight /></NuxtLink>
             </Button>
             <Button
                 size="lg"
                 variant="outline"
                 class="px-8 text-md font-medium h-12"
                 as-child>
-                <NuxtLink to="/about">了解更多</NuxtLink>
+                <NuxtLink to="/about"> <Info /> 了解更多</NuxtLink>
+            </Button>
+            <!-- 作品 / 成员 -->
+            <Button
+                size="lg"
+                variant="outline"
+                class="px-8 text-md font-medium h-12"
+                as-child>
+                <NuxtLink to="/works">作品 <ArrowRight /></NuxtLink>
+            </Button>
+            <Button
+                size="lg"
+                variant="outline"
+                class="px-8 text-md font-medium h-12"
+                as-child>
+                <NuxtLink to="/members">成员 <ArrowRight /></NuxtLink>
             </Button>
         </div>
     </div>

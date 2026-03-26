@@ -31,6 +31,10 @@ async function getList() {
 }
 
 getList();
+
+useSeoMeta({
+    title: "作品",
+});
 </script>
 
 <template>

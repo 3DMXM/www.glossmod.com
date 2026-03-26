@@ -85,6 +85,10 @@ const sections = [
         ],
     },
 ] as const;
+
+useSeoMeta({
+    title: "加入",
+});
 </script>
 <template>
     <div class="mx-auto flex max-w-6xl flex-col gap-8 lg:gap-10">

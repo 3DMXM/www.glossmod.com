@@ -11,6 +11,10 @@ const getAboutContent = async () => {
 onMounted(() => {
     getAboutContent();
 });
+
+useSeoMeta({
+    title: "关于",
+});
 </script>
 <template>
     <div class="mx-auto max-w-6xl px-4 py-16 xl:px-6">

@@ -10,19 +10,20 @@ Gloss Mod组 (3DM Mod 组) 于 2019年1月20日建立[^1],
 
 ## 成员 
 
-> 组员可以自己添加自己的介绍, 文档: 
+> 组员可以自己添加/编辑自己的介绍: [编辑](https://github.com/GlossMod/www.glossmod.com/edit/main/public/docs/AboutGlossMod.md)
 
 ### 小莫
 个人网站: https://www.aoe.top/
-3DM Mod组 (Gloss Mod组) 组长, 3DM Mod站 站长, 平时负责Mod站的维护和开发, 以及新成员的申请处理
+3DM Mod组 (Gloss Mod组) 组长, 3DM Mod站 站长, 平时负责Mod站的维护和开发, 以及新成员的申请处理.
 
 
 ## Gloss 和 3DM 的关系
-就是同一个组, Gloss 这个名称是当初准备在 GitHub开源项目的时候， XMDS 大佬想的一个名字(好像是 `Games love open source`的缩写?).
+就是同一个组, Gloss 这个名称是当初准备在 GitHub开源项目的时候， [XMDS](https://mod.3dmgame.com/u/19668643) 想的一个名字(好像是 `Games love open source`的缩写?).
 因为很多时候 以 "3dm"开头的项目/类/变量，都需要在前面加 `_` ,感觉很麻烦，于是就在群里征集了一个名字.
 从那之后，英文相关的项目都用 Gloss Mod来命名.
 
-没有什么两个组，或者脱离3DM 什么之类的, 都是一家的, 只是名字不一样而已, 依然属于 3DM 旗下.
+没有什么两个组，或者脱离3DM 什么之类的, 都是一个东西, 只是名字不一样而已.
+一般对外的介绍为 Gloss Mod组, 但是在3DM里，还是叫3DM Mod组.
 
 ## 时间线
 
@@ -40,7 +41,6 @@ Gloss Mod组 (3DM Mod 组) 于 2019年1月20日建立[^1],
 - 9月23日: 得到 [GameBanana](https://gamebanana.com/) 的授权, GMM 接入 GameBanana 的官方API.
 
 ### 2023年
-- 3月15日: GitHub组织GlossMod成立[^2]
 - 4月15日: 由于在QQ群讨论汇编相关问题，可能触发关键词导致群被封禁，日次建立新群，部分成员至今未加入新群导致失联
 - 4月17日: 为了防止再次出现群被封禁的情况，建立新的Discord群组
 - 6月20日: 开源项目 [Gloss Mod Manager](https://github.com/GlossMod/Gloss-Mod-Manager)
@@ -64,10 +64,10 @@ Gloss Mod组 (3DM Mod 组) 于 2019年1月20日建立[^1],
 - 12月: 跟3DM 论坛某管理冲突[^4], 我正式退出论坛的管理, 将重心放在Mod站的建设上.
 
 ### 2020年
-- 4月: 3DM Mod组中的部分成员加入采蘑菇, 并在3DM发Mod引流采蘑菇, 然后被我全部封禁, 自此, 采蘑菇和3DM 彻底翻脸. 
+- 4月: 3DM Mod组中的部分成员加入采蘑菇(或者说是潜伏在3DM的采蘑菇成员?), 并在3DM发Mod引流采蘑菇, 然后被我全部封禁, 自此, 采蘑菇和3DM 彻底翻脸. 
 - 7月14日: 个人中心上线,添加了可以关注作者的功能
 - 8月: 实现Mod站发布/更新 自动同步论坛功能.
-- 12月: 狩技组组长 尝试回到3DM, 但被我无视, 至此算是与 狩技组也不相往来了. 
+- 12月: 狩技组组长 尝试回到3DM, 但被我无视, 至此与狩技组不再有联系. 
 
 ### 2019年
 - 1月20日: 成立3DM Mod组[^1]
