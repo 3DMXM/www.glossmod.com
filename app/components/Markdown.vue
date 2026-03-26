@@ -1,16 +1,32 @@
 <script setup lang="ts">
 import { Markdown } from "@/lib/Markdown";
 import { BookText } from "lucide-vue-next";
-import "github-markdown-css";
+import darkMarkdownCssUrl from "github-markdown-css/github-markdown-dark.css?url";
+import lightMarkdownCssUrl from "github-markdown-css/github-markdown-light.css?url";
 
 const props = defineProps<{
     content: string;
 }>();
 
+const colorMode = useColorMode();
 const contentRef = ref<HTMLElement | null>(null);
 const activeHeadingId = ref("");
 
 const renderResult = computed(() => Markdown.renderWithHeadings(props.content));
+const isDark = computed(() => colorMode.value === "dark");
+const markdownThemeStylesheet = computed(() =>
+    isDark.value ? darkMarkdownCssUrl : lightMarkdownCssUrl,
+);
+
+useHead(() => ({
+    link: [
+        {
+            key: "github-markdown-theme",
+            rel: "stylesheet",
+            href: markdownThemeStylesheet.value,
+        },
+    ],
+}));
 
 const tocHeadings = computed(() => {
     const nestedHeadings = renderResult.value.headings.filter(
