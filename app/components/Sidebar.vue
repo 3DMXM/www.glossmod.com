@@ -13,8 +13,8 @@ const route = useRoute();
 
 const navItems = [
     { name: "首页", path: "/", icon: HomeIcon },
-    { name: "作品", path: "/list", icon: PanelTopBottomDashed },
     { name: "成员", path: "/members", icon: CircleUser },
+    { name: "作品", path: "/list", icon: PanelTopBottomDashed },
     { name: "加入", path: "/join", icon: CirclePlus },
     { name: "悬赏版", path: "/bounty", icon: Table2 },
     { name: "打赏", path: "/donate", icon: Gift },
