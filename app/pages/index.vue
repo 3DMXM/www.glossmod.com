@@ -44,7 +44,7 @@ import { Info, ArrowRight } from "lucide-vue-next";
                 variant="outline"
                 class="px-8 text-md font-medium h-12"
                 as-child>
-                <NuxtLink to="/works">作品 <ArrowRight /></NuxtLink>
+                <NuxtLink to="/list">作品 <ArrowRight /></NuxtLink>
             </Button>
             <Button
                 size="lg"
